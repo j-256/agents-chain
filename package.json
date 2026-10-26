@@ -1,0 +1,32 @@
+{
+  "name": "agents-chain",
+  "version": "0.1.0",
+  "description": "Deliver governing AGENTS.md instructions across coding-agent repository and worktree boundaries",
+  "type": "module",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "agents-chain-report": "agents-chain-report",
+    "agents-chain-codex": "hooks/codex.mjs",
+    "agents-chain-claude": "hooks/claude.mjs"
+  },
+  "files": [
+    "agents-chain-report",
+    "hooks/",
+    "lib/",
+    "docs/",
+    "examples/",
+    "README.md",
+    "INSTALL.md",
+    "LICENSE",
+    "research/",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node scripts/check.mjs && npm test"
+  }
+}

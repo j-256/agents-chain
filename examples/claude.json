@@ -1,0 +1,17 @@
+{
+  "pluginConfigs": {
+    "cc-plugin-agents-md@builtin": {
+      "options": { "instructionFiles": "claude-md-and-agents-md" }
+    }
+  },
+  "hooks": {
+    "SessionStart": [{
+      "matcher": "startup|resume|clear|compact",
+      "hooks": [{ "type": "command", "command": "node \"$HOME/src/agents-chain/hooks/claude.mjs\" --log-only", "timeout": 10 }]
+    }],
+    "PreToolUse": [{
+      "matcher": "^(Read|Write|Edit|MultiEdit|NotebookEdit|Bash)$",
+      "hooks": [{ "type": "command", "command": "node \"$HOME/src/agents-chain/hooks/claude.mjs\" --log-only", "timeout": 10 }]
+    }]
+  }
+}

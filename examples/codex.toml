@@ -1,0 +1,17 @@
+# Merge these entries into user config and adjust the checkout path
+[[hooks.SessionStart]]
+matcher = "startup|resume|clear|compact"
+
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = 'node "$HOME/src/agents-chain/hooks/codex.mjs" --log-only'
+timeout = 10
+
+[[hooks.PreToolUse]]
+matcher = "^(apply_patch|Bash|exec_command)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'node "$HOME/src/agents-chain/hooks/codex.mjs" --log-only'
+timeout = 10
+statusMessage = "Checking instruction coverage"
