@@ -37,6 +37,8 @@ SessionStart seeds the files the configured runtime is expected to load natively
 
 Reads receive missing context. A write that encounters undelivered instructions gets exit code 2 and the rendered chain on stderr; the agent must retry the identical tool invocation. The hook does not execute the tool or retry it on the agent's behalf. The retry passes once pending instructions fit. A read or SessionStart may already have delivered the rules, so the first write does not always block.
 
+Shell calls can access paths in several directories. Their combined instructions use a heading about the accessed paths, and each file block or reference identifies the directory it governs. `git worktree list`, `git stash list`, and `git stash show` are repository reads; mutating forms retain write classification. A file destination supplied with `--output`, a file output redirect, or another mutating command in the same shell call still makes that call a write.
+
 For two seconds after delivery, a different parallel write under the same rules can also block. Changed files are resent as context. Codex has a four-hour fallback for unchanged deliveries because retained context can be uncertain.
 
 Shell parsing is best effort: paths inside scripts, dynamic substitutions, unusual shell syntax, missing workdir data and unsupported tools can defeat attribution. An unresolved-word counter measures parser uncertainty rather than a true path-miss rate. The hook is not a universal filesystem interposer. Git is used to recover a linked worktree's main checkout; containing instructions above that checkout are added to the worktree's physical chain. No Git synchronization, branch mutation or publication is performed.
