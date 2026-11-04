@@ -17,7 +17,7 @@ test('the archive installs independently and preserves real hook retry behavior'
   assert.equal(packed.status, 0, packed.stderr)
   const info = JSON.parse(packed.stdout)[0]
   const files = info.files.map(f => f.path)
-  for (const required of ['README.md', 'INSTALL.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'research/opencode/probe-source.mts', 'docs/behavior.md', 'docs/handling.md', 'docs/probes.md', 'lib/state.mjs', 'hooks/claude.mjs', 'hooks/codex.mjs']) assert.ok(files.includes(required), required)
+  for (const required of ['README.md', 'INSTALL.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'research/opencode/probe-source.mts', 'docs/behavior.md', 'docs/handling.md', 'docs/probes.md', 'lib/state.mjs', 'hooks/claude.mjs', 'hooks/codex.mjs', 'hooks/opencode.mjs']) assert.ok(files.includes(required), required)
   assert.ok(files.every(path => !path.startsWith('test/') && !path.includes('.git/')))
   const prefix = join(temp, 'prefix with spaces')
   const installed = spawnSync('npm', ['install', '--prefix', prefix, '--offline', '--ignore-scripts', '--no-audit', '--no-fund', join(temp, info.filename)], { encoding: 'utf8' })
@@ -29,7 +29,7 @@ test('the archive installs independently and preserves real hook retry behavior'
   await mkdir(join(fixture, 'start'))
   await mkdir(join(fixture, 'rules'))
   await writeFile(join(fixture, 'rules', 'AGENTS.md'), 'Package-specific instructions\n')
-  for (const runtime of ['claude', 'codex']) {
+  for (const runtime of ['claude', 'codex', 'opencode']) {
     const payload = { session_id: `package-${runtime}`, hook_event_name: 'PreToolUse', cwd: join(fixture, 'start'), tool_name: 'Bash', tool_input: { command: `printf 'probe\\n' >> '${join(fixture, 'rules', 'output.txt')}'` } }
     const options = { encoding: 'utf8', input: JSON.stringify(payload), env: { ...process.env, AGENTS_CHAIN_DISABLE: '0', AGENTS_CHAIN_MODE: 'live', XDG_STATE_HOME: join(temp, 'state') } }
     const hook = join(packageRoot, 'hooks', `${runtime}.mjs`)

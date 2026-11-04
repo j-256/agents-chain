@@ -2,6 +2,8 @@
 
 These steps are for a coding agent or a person working from a copy of this repository. Install only for the requested runtimes. The default is log-only: the hooks record what they would deliver without adding instructions or blocking writes. Enabling live delivery is a separate step.
 
+These command-hook installation examples cover Claude Code and Codex. OpenCode adapter authors should use the [instruction-engine contract](docs/opencode-engine.md); do not register its command entrypoint as if OpenCode supported foreign lifecycle JSON hooks.
+
 ## 1. Keep the files at a stable path
 
 Use an existing permanent checkout, or clone the repository you were given into a directory under home such as `$HOME/src/agents-chain`. An extracted package archive also works. Hook commands point to these files, so do not register a temporary checkout, disposable worktree or Downloads directory.

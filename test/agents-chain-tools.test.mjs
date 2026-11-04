@@ -133,7 +133,7 @@ const HEADER = dir => `AGENTS.md instructions that govern ${dir} were not yet in
 const RETRY = 'The tool call was not run so these instructions could be read first. Re-issue the same call now.'
 
 test('budgets match the spec', () => {
-  assert.deepEqual({ ...BUDGET }, { claude: 9500, codex: 32000, bounce: 40000 })
+  assert.deepEqual({ ...BUDGET }, { claude: 9500, codex: 32000, opencode: 32000, bounce: 40000 })
 })
 
 test('packContext lays out files outermost first under the header', () => {

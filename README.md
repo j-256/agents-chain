@@ -68,7 +68,7 @@ Reports separate runtime and mode, with delivery reasons, retries, volume, timin
 - **Failure behavior:** internal errors let the tool call proceed. Supplied instructions are context, not a security boundary or a guarantee that the agent follows them.
 - **Local state:** private state and logs live under `${XDG_STATE_HOME:-$HOME/.local/state}/agents-chain/`. Logs omit instruction and command text but include paths. See [trust, state and privacy](docs/handling.md#trust-state-and-privacy).
 
-OpenCode has a separate [V1 assessment and V2 documentation comparison](docs/opencode.md). No OpenCode adapter is shipped.
+OpenCode has an [instruction-engine contract](docs/opencode-engine.md) for native adapter authors and a separate [V1 assessment and V2 documentation comparison](docs/opencode.md). The engine entrypoint consumes normalized lifecycle JSON; a full native plugin and its runtime registration belong to the consuming adapter.
 
 ## Documentation
 
@@ -79,6 +79,7 @@ OpenCode has a separate [V1 assessment and V2 documentation comparison](docs/ope
 | [Before/after probes](docs/probes.md) | Check model-visible instructions and first-write retries in isolated sessions |
 | [Native behavior comparison](docs/behavior.md) | Compare version-scoped findings for Codex, Claude Code and OpenCode |
 | [OpenCode probes](docs/opencode-probes.md) | Reproduce the provider-free V1 research |
+| [OpenCode engine](docs/opencode-engine.md) | Integrate exact native evidence and normalized lifecycle events |
 
 ## Development
 
