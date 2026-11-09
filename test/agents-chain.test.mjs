@@ -146,6 +146,7 @@ for (const runtime of ['claude', 'codex']) {
     await f.put('cmp/AGENTS.md', 'CMP rules\n')
     const file = await f.put('cmp/file.txt', 'data\n')
     await f.read(file)
+    f.tick(4 * HOUR + 1)
     await f.hook('SessionStart', { source: 'resume' })
     quiet(await f.read(file))
     await f.hook('SessionStart', { source: 'compact' })
@@ -233,19 +234,24 @@ test('claude notes a file that exceeds its context budget and the write delivers
   assert.ok(bounce.stderr.includes('N'.repeat(12000)))
 })
 
-test('codex re-sends deliveries older than four hours as context, claude does not', async t => {
-  for (const [runtime, resent] of [['codex', true], ['claude', false]]) {
+for (const runtime of ['claude', 'codex']) {
+  test(`${runtime}: elapsed time preserves deliveries across reads, writes and resume`, async t => {
     const f = await fixture(t, runtime)
     await f.hook('SessionStart', { source: 'startup' })
     await f.put('old/AGENTS.md', 'OLD rules\n')
     const file = await f.put('old/file.txt', 'data\n')
     await f.read(file)
+    const deliveredBytes = (await f.logLines()).at(-1).epochBytes
     f.tick(4 * HOUR + 1)
-    const again = await f.read(file)
-    if (resent) assert.match(f.context(again), /OLD rules/)
-    else quiet(again)
-  }
-})
+    quiet(await f.read(file))
+    quiet(await f.write(file))
+    f.tick(24 * HOUR)
+    quiet(await f.hook('SessionStart', { source: 'resume' }))
+    quiet(await f.read(file))
+    quiet(await f.write(file))
+    assert.equal((await f.logLines()).at(-1).epochBytes, deliveredBytes)
+  })
+}
 
 const ADAPTER_PAYLOADS = {
   claude: base => ({ tool_name: 'Write', tool_input: { file_path: join(base, 'home/other/x.txt'), content: 'x' } }),
@@ -409,12 +415,13 @@ for (const runtime of ['claude', 'codex']) {
     const second = await f.put('sib/b/file.txt', 'data\n')
     await f.put('sib/b/AGENTS.md', 'SIB rules\n')
     assert.match(f.context(await f.read(first)), /SIB rules/)
+    f.tick(4 * HOUR + 1)
     const read = await f.read(second)
     assert.equal(read.exitCode, 0)
     assert.equal(f.context(read).includes('SIB rules'), false)
     assert.ok(f.context(read).includes(twinNote(f, 'sib/a/AGENTS.md', 'sib/b/AGENTS.md')))
     quiet(await f.read(second))
-    f.tick(5000)
+    f.tick(4 * HOUR + 1)
     await f.put('sib/c/AGENTS.md', 'SIB rules\n')
     const write = await f.write(join(f.base, 'sib/c/new.txt'))
     assert.equal(write.exitCode, 0, 'a write under a covered directory is not bounced')
@@ -569,7 +576,7 @@ test('legacy state gains zero accounting, while invalid counters fail open', asy
   assert.equal((await f.logLines()).at(-1).error, 'STATE_INVALID')
 })
 
-test('reasons follow changed, recent, noted and stale classifications', async t => {
+test('reasons follow changed, recent and noted classifications without age redelivery', async t => {
   const f = await fixture(t, 'codex')
   await f.hook('SessionStart', { source: 'startup' })
   const rules = await f.put('why/AGENTS.md', '# Why\noriginal')
@@ -582,8 +589,8 @@ test('reasons follow changed, recent, noted and stale classifications', async t 
   await f.read(file)
   assert.equal((await f.logLines()).at(-1).reasons[rules], 'changed')
   f.tick(4 * HOUR + 1)
-  await f.read(file)
-  assert.equal((await f.logLines()).at(-1).reasons[rules], 'stale')
+  quiet(await f.read(file))
+  assert.deepEqual((await f.logLines()).at(-1).reasons, {})
   const c = await fixture(t, 'claude')
   await c.hook('SessionStart', { source: 'startup' })
   const large = await c.put('why/AGENTS.md', 'L'.repeat(12000))

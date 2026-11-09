@@ -39,11 +39,11 @@ Reads receive missing context. A write that encounters undelivered instructions 
 
 Shell calls can access paths in several directories. Their combined instructions use a heading about the accessed paths, and each file block or reference identifies the directory it governs. `git worktree list`, `git stash list`, and `git stash show` are repository reads; mutating forms retain write classification. A file destination supplied with `--output`, a file output redirect, or another mutating command in the same shell call still makes that call a write.
 
-For two seconds after delivery, a different parallel write under the same rules can also block. Changed files are resent as context. Codex has a four-hour fallback for unchanged deliveries because retained context can be uncertain.
+For two seconds after delivery, a different parallel write under the same rules can also block. Changed files are resent as context. Unchanged deliveries and identical-content references remain valid regardless of age. A SessionStart event with a source other than `resume`, including `compact`, resets delivery state so governing instructions can be delivered again.
 
 Shell parsing is best effort: paths inside scripts, dynamic substitutions, unusual shell syntax, missing workdir data and unsupported tools can defeat attribution. An unresolved-word counter measures parser uncertainty rather than a true path-miss rate. The hook is not a universal filesystem interposer. Git is used to recover a linked worktree's main checkout; containing instructions above that checkout are added to the worktree's physical chain. No Git synchronization, branch mutation or publication is performed.
 
-Files are identified by device and inode. A never-seen file matching previously delivered or native content receives a short reference rather than another full copy. Outlines do not establish a full-content twin. Content updates, earlier resets and fallback resends remain distinct reasons. Direct Claude Read/Write operations on AGENTS files have their own state handling; shell mentions go through ordinary chain delivery.
+Files are identified by device and inode. A never-seen file matching previously delivered or native content receives a short reference rather than another full copy. Outlines do not establish a full-content twin. Content updates and earlier resets remain distinct reasons. Direct Claude Read/Write operations on AGENTS files have their own state handling; shell mentions go through ordinary chain delivery.
 
 ## Size and ordering
 
@@ -74,5 +74,7 @@ node agents-chain-report --usage-file /path/to/selected-session.jsonl
 ```
 
 Reports separate runtime and mode, show partial/uncertain reset coverage, retries, limits, timing and errors, and estimate emitted or projected tokens with the labeled `utf8-bytes/4` heuristic. Fractional estimates make byte attribution additive. Full blocks, outlines, notes, covered references and wrappers have separate volume; reasons and largest contributing paths help diagnose resends. Legacy byte-only records retain unknown attribution.
+
+Reports continue to recognize historical `stale` reasons from the removed four-hour fallback. Delivery ages and the existing JSON age buckets remain available for historical comparisons; age alone does not trigger instruction delivery.
 
 Optional usage sources are explicit local files, read only by the report command. Codex cumulative snapshots are selected rather than summed. Claude request updates are deduplicated, with input normalized to include cache reads and writes. Missing counters, baselines or timestamps, counter resets, invalid identifiers and partial sources remain explicit. Regular files are limited to 64 MiB of observed extent; lines over 1 MiB are skipped. The transcript schema is version-sensitive. Session totals are not the counterfactual extra cost of the hook, reasoning is not added twice to output, and no dollar-increase percentage is inferred. Collection makes no provider calls and writes no transcripts.
